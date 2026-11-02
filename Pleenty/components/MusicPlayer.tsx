@@ -45,6 +45,18 @@ export default function MusicPlayer() {
     }
   }, [enabled, tracks, index, tryPlay]);
 
+  // Browsers block audible autoplay, so start on the visitor's first interaction with the page.
+  useEffect(() => {
+    if (!enabled || !needsTap) return;
+    const events = ['pointerdown', 'click', 'keydown', 'touchstart', 'scroll', 'wheel'];
+    const start = () => {
+      events.forEach(name => window.removeEventListener(name, start));
+      void tryPlay();
+    };
+    events.forEach(name => window.addEventListener(name, start, { passive: true }));
+    return () => events.forEach(name => window.removeEventListener(name, start));
+  }, [enabled, needsTap, tryPlay]);
+
   if (pathname.startsWith('/admin') || !enabled || !tracks.length) return null;
   const next = () => setIndex(current => (current + 1) % tracks.length);
   return <aside className="store-music-player" aria-label="FreshCart store music">
