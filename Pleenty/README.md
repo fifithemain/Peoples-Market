@@ -7,7 +7,7 @@ Next.js grocery-delivery MVP with a storefront, basket, checkout, and admin dash
 - Supabase PostgreSQL accessed through Prisma
 - Client-side basket persistence
 - Vercel deployment
-- Admin dashboard at `/admin`
+- Admin dashboard at `/admin` (own folder: `app/admin`)
 
 ## Required environment variables
 
@@ -42,7 +42,7 @@ npx prisma db seed
 
 ## Admin
 
-Open `/admin` and enter the value configured as `ADMIN_ACCESS_KEY`. This is an MVP access gate, not a replacement for Supabase Auth and role-based authorization. Before allowing multiple staff members or handling real customer orders, replace it with Supabase Auth and server-side role checks.
+Open `/admin`. The owner signs in with the value configured as `ADMIN_ACCESS_KEY` and has full access. The owner can add **order managers** under **Team** by entering the email of a People's Market account (the person must create and confirm that account first). Order managers sign in on `/admin` using the **Order manager** option with their account email and password, and can only view orders and mark products sold out or back in stock; every action is enforced on the server (`app/admin/_lib/permissions.ts`). The dashboard updates live (about every 4 seconds) and the storefront reflects stock changes within about 5 seconds. Staff are stored in the existing `app_settings` table (key `admin_staff`), so no migration is needed. The access key remains a shared secret: keep it long and private.
 
 ## Known MVP limits
 

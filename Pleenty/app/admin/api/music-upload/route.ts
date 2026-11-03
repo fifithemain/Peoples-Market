@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { authenticate } from '../../_lib/auth';
+import { can } from '../../_lib/permissions';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
-  const suppliedKey = request.headers.get('x-admin-key') || '';
-  if (!process.env.ADMIN_ACCESS_KEY || suppliedKey !== process.env.ADMIN_ACCESS_KEY) {
+  const header = request.headers.get('authorization') || '';
+  const actor = await authenticate(header.startsWith('Bearer ') ? header.slice(7) : '');
+  if (!actor || !can(actor.role, 'music:manage')) {
     return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
   }
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;

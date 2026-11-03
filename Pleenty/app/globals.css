@@ -24,6 +24,7 @@
 /* FreshCart admin dashboard refresh */
 .admin-shell{background:#f5f7f2;min-height:100vh}
 .admin-header{position:sticky;top:0;z-index:20;gap:18px;box-shadow:0 4px 18px #102a1b12}
+.admin-live{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}.admin-live small{opacity:.85;font-size:12px}
 .admin-header span{display:block;margin-top:5px}
 .admin-login form{display:grid;gap:12px}
 .admin-login label{display:grid;gap:7px;font-size:12px;font-weight:700}
