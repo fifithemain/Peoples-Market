@@ -1,6 +1,6 @@
 CREATE TABLE "push_subscriptions" (
   "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-  "token" TEXT NOT NULL,
+  "fid" TEXT NOT NULL,
   "role" TEXT NOT NULL,
   "email" TEXT,
   "user_agent" TEXT,
@@ -9,10 +9,10 @@ CREATE TABLE "push_subscriptions" (
   "last_seen_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT "push_subscriptions_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "push_subscriptions_role_check" CHECK ("role" IN ('OWNER', 'ORDER_MANAGER')),
-  CONSTRAINT "push_subscriptions_token_check" CHECK (char_length("token") BETWEEN 20 AND 4096)
+  CONSTRAINT "push_subscriptions_fid_check" CHECK (char_length("fid") BETWEEN 20 AND 4096)
 );
 
-CREATE UNIQUE INDEX "push_subscriptions_token_key" ON "push_subscriptions"("token");
+CREATE UNIQUE INDEX "push_subscriptions_fid_key" ON "push_subscriptions"("fid");
 CREATE INDEX "push_subscriptions_role_email_idx" ON "push_subscriptions"("role", "email");
 
 CREATE TABLE "notification_events" (
