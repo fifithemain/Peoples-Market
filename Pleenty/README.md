@@ -58,7 +58,7 @@ FreshCart can send browser push notifications to the owner and approved order ma
 6. Before deploying this branch, apply `prisma/migrations/20261106133800_fcm_order_notifications/migration.sql` to the Supabase database using the SQL Editor. The migration creates two RLS-protected tables; no existing order, product, customer, or staff rows are changed.
 7. Deploy the branch, sign in to `/admin` as the owner and each order manager, then select **Enable notifications** on every browser/device that should receive alerts.
 
-The server stores device tokens and notification delivery events in the new tables. Repeated payment verification is idempotent: a paid order event is only sent once successfully. If Firebase is not configured or a device has not opted in, checkout and payment verification continue to work; notification delivery failures are recorded without failing the customer's order.
+The server stores Firebase Installation IDs (FIDs) and notification delivery events in the new tables. Repeated payment verification is idempotent: a paid order event is only sent once successfully. If Firebase is not configured or a device has not opted in, checkout and payment verification continue to work; notification delivery failures are recorded without failing the customer's order.
 
 Web push requires HTTPS and browser support. iPhone/iPad notifications require the site to be installed as a web app on supported iOS/iPadOS versions before permission can be granted.
 
