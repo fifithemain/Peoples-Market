@@ -17,22 +17,22 @@ export async function POST(request: NextRequest) {
   const actor = await getActor(request);
   if (!actor) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStore });
 
-  let body: { token?: unknown };
+  let body: { fid?: unknown };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400, headers: noStore });
   }
 
-  const token = typeof body.token === 'string' ? body.token.trim() : '';
-  if (token.length < 20 || token.length > 4096) {
-    return NextResponse.json({ error: 'Invalid notification device token.' }, { status: 400, headers: noStore });
+  const fid = typeof body.fid === 'string' ? body.fid.trim() : '';
+  if (fid.length < 20 || fid.length > 4096) {
+    return NextResponse.json({ error: 'Invalid notification device fid.' }, { status: 400, headers: noStore });
   }
 
   await prisma.pushSubscription.upsert({
-    where: { token },
+    where: { fid },
     create: {
-      token,
+      fid,
       role: actor.role,
       email: actor.email || null,
       userAgent: (request.headers.get('user-agent') || '').slice(0, 512) || null,
@@ -53,21 +53,21 @@ export async function DELETE(request: NextRequest) {
   const actor = await getActor(request);
   if (!actor) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStore });
 
-  let body: { token?: unknown };
+  let body: { fid?: unknown };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400, headers: noStore });
   }
 
-  const token = typeof body.token === 'string' ? body.token.trim() : '';
-  if (token.length < 20 || token.length > 4096) {
-    return NextResponse.json({ error: 'Invalid notification device token.' }, { status: 400, headers: noStore });
+  const fid = typeof body.fid === 'string' ? body.fid.trim() : '';
+  if (fid.length < 20 || fid.length > 4096) {
+    return NextResponse.json({ error: 'Invalid notification device fid.' }, { status: 400, headers: noStore });
   }
 
   await prisma.pushSubscription.deleteMany({
     where: {
-      token,
+      fid,
       role: actor.role,
       email: actor.email || null,
     },
