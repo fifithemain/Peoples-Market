@@ -76,15 +76,15 @@ export async function sendPaidOrderNotification(orderId: string) {
       },
     });
 
-    const invalidTokens = subscriptions
+    const invalidFids = subscriptions
       .filter((item, index) => {
         const code = response.responses[index]?.error?.code;
         return code === 'messaging/installation-id-not-registered';
       })
       .map(item => item.fid);
 
-    if (invalidTokens.length) {
-      await prisma.pushSubscription.deleteMany({ where: { fid: { in: invalidTokens } } });
+    if (invalidFids.length) {
+      await prisma.pushSubscription.deleteMany({ where: { fid: { in: invalidFids } } });
     }
 
     if (response.successCount > 0) {
