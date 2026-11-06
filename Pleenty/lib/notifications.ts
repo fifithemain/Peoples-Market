@@ -79,8 +79,7 @@ export async function sendPaidOrderNotification(orderId: string) {
     const invalidTokens = subscriptions
       .filter((item, index) => {
         const code = response.responses[index]?.error?.code;
-        return code === 'messaging/installation-id-not-registered' ||
-          code === 'messaging/installation-id-not-registered';
+        return code === 'messaging/installation-id-not-registered';
       })
       .map(item => item.fid);
 
