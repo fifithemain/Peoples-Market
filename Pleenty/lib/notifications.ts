@@ -54,7 +54,7 @@ export async function sendPaidOrderNotification(orderId: string) {
 
     const orderNumber = order.id.slice(0, 8).toUpperCase();
     const response = await getFreshCartFirebaseMessaging().sendEachForMulticast({
-      tokens: subscriptions.map(item => item.token),
+      fids: subscriptions.map(item => item.fid),
       notification: {
         title: 'New FreshCart order #' + orderNumber,
         body: 'Payment confirmed · R' + Number(order.totalAmount).toFixed(2),
@@ -79,13 +79,13 @@ export async function sendPaidOrderNotification(orderId: string) {
     const invalidTokens = subscriptions
       .filter((item, index) => {
         const code = response.responses[index]?.error?.code;
-        return code === 'messaging/registration-token-not-registered' ||
-          code === 'messaging/invalid-registration-token';
+        return code === 'messaging/installation-id-not-registered' ||
+          code === 'messaging/installation-id-not-registered';
       })
-      .map(item => item.token);
+      .map(item => item.fid);
 
     if (invalidTokens.length) {
-      await prisma.pushSubscription.deleteMany({ where: { token: { in: invalidTokens } } });
+      await prisma.pushSubscription.deleteMany({ where: { fid: { in: invalidTokens } } });
     }
 
     if (response.successCount > 0) {
