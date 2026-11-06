@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getBrowserMessagingToken, isFirebaseMessagingConfigured } from '@/lib/firebase-client';
+import { getBrowserMessagingFid, isFirebaseMessagingConfigured } from '@/lib/firebase-client';
 import type { Unsubscribe } from 'firebase/messaging';
 
 type Props = { getCredential: () => Promise<string> };
@@ -21,7 +21,7 @@ export default function NotificationSettings({ getCredential }: Props) {
         throw new Error('Firebase notifications have not been configured yet.');
       }
 
-      const { token, messaging } = await getBrowserMessagingToken(requestPermission);
+      const { fid, messaging } = await getBrowserMessagingFid(requestPermission);
       const credential = await getCredential();
       if (!credential) throw new Error('Your admin session has expired. Please sign in again.');
 
@@ -31,7 +31,7 @@ export default function NotificationSettings({ getCredential }: Props) {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + credential,
         },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ fid }),
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || 'Could not register this device.');
