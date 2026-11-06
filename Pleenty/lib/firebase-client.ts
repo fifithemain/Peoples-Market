@@ -1,5 +1,5 @@
 import { getApps, initializeApp } from 'firebase/app';
-import type { Messaging } from 'firebase/messaging';
+import type { Messaging, Unsubscribe } from 'firebase/messaging';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -21,8 +21,8 @@ export function isFirebaseMessagingConfigured() {
 }
 
 /** Called only after a manager or owner explicitly enables notifications. */
-export async function getBrowserMessagingToken(requestPermission: boolean): Promise<{
-  token: string;
+export async function getBrowserMessagingFid(requestPermission: boolean): Promise<{
+  fid: string;
   messaging: Messaging;
 }> {
   if (typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) {
@@ -32,7 +32,7 @@ export async function getBrowserMessagingToken(requestPermission: boolean): Prom
     throw new Error('Firebase notifications are not configured yet. Please contact the store owner.');
   }
 
-  const { isSupported, getMessaging, getToken } = await import('firebase/messaging');
+  const { isSupported, getMessaging, onRegistered, register } = await import('firebase/messaging');
   if (!(await isSupported())) {
     throw new Error('Push notifications are not supported by this browser.');
   }
@@ -47,11 +47,37 @@ export async function getBrowserMessagingToken(requestPermission: boolean): Prom
     initializeApp(firebaseConfig, 'freshcart-push');
   const messaging = getMessaging(app);
   const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-  const token = await getToken(messaging, {
-    vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
-    serviceWorkerRegistration: registration,
+
+  const fid = await new Promise<string>((resolve, reject) => {
+    let settled = false;
+    let unsubscribe: Unsubscribe = () => undefined;
+    const timeout = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      unsubscribe();
+      reject(new Error('Firebase registration timed out. Please try again.'));
+    }, 15000);
+
+    unsubscribe = onRegistered(messaging, installationId => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeout);
+      unsubscribe();
+      resolve(installationId);
+    });
+
+    void register(messaging, {
+      vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+      serviceWorkerRegistration: registration,
+    }).catch(error => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeout);
+      unsubscribe();
+      reject(error);
+    });
   });
 
-  if (!token) throw new Error('Firebase did not return a device registration token.');
-  return { token, messaging };
+  if (!fid) throw new Error('Firebase did not return a device installation ID.');
+  return { fid, messaging };
 }
