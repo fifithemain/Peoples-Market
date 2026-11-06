@@ -12,6 +12,7 @@ import ProductsPanel from './_components/ProductsPanel';
 import CategoriesPanel from './_components/CategoriesPanel';
 import DeliveryPanel from './_components/DeliveryPanel';
 import MusicPanel from './_components/MusicPanel';
+import NotificationSettings from './_components/NotificationSettings';
 
 type Tab = 'overview' | 'products' | 'categories' | 'delivery' | 'music' | 'orders' | 'cancelled' | 'stock' | 'team';
 type SessionKind = 'owner' | 'staff';
@@ -193,7 +194,7 @@ export default function AdminApp() {
   return <main className="admin-shell">
     <header className="admin-header">
       <div><b>FreshCart Admin</b><span>{data ? ROLE_LABELS[data.role] + (data.email ? ' · ' + data.email : '') : 'Store management'}</span></div>
-      {data && <div className="admin-live" role="status" aria-live="polite"><small>{live ? '● Live' : '○ Reconnecting…'}{lastSync ? ' · updated ' + lastSync.toLocaleTimeString('en-ZA') : ''}</small><button onClick={() => void signOut()}>Sign out</button></div>}
+      {data && <div className="admin-live" role="status" aria-live="polite"><small>{live ? '● Live' : '○ Reconnecting…'}{lastSync ? ' · updated ' + lastSync.toLocaleTimeString('en-ZA') : ''}</small><NotificationSettings getCredential={getCredential} /><button onClick={() => void signOut()}>Sign out</button></div>}
     </header>
     {!data || !role ? <LoginPanel busy={busy} error={error} onOwner={key => void ownerLogin(key)} onStaff={(email, password) => void staffLogin(email, password)} /> : <>
       <nav className="admin-nav">
