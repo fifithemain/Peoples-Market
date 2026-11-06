@@ -88,7 +88,7 @@ model AppSetting {
 
 model PushSubscription {
   id         String   @id @default(uuid()) @db.Uuid
-  token      String   @unique
+  fid        String   @unique
   role       String
   email      String?
   userAgent  String?  @map("user_agent")
