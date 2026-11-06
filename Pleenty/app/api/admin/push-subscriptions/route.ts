@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
   const fid = typeof body.fid === 'string' ? body.fid.trim() : '';
   if (fid.length < 20 || fid.length > 4096) {
-    return NextResponse.json({ error: 'Invalid notification device fid.' }, { status: 400, headers: noStore });
+    return NextResponse.json({ error: 'Invalid Firebase installation ID.' }, { status: 400, headers: noStore });
   }
 
   await prisma.pushSubscription.upsert({
@@ -62,7 +62,7 @@ export async function DELETE(request: NextRequest) {
 
   const fid = typeof body.fid === 'string' ? body.fid.trim() : '';
   if (fid.length < 20 || fid.length > 4096) {
-    return NextResponse.json({ error: 'Invalid notification device fid.' }, { status: 400, headers: noStore });
+    return NextResponse.json({ error: 'Invalid Firebase installation ID.' }, { status: 400, headers: noStore });
   }
 
   await prisma.pushSubscription.deleteMany({
