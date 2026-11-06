@@ -44,6 +44,24 @@ npx prisma db seed
 
 Open `/admin`. The owner signs in with the value configured as `ADMIN_ACCESS_KEY` and has full access. The owner can add **order managers** under **Team** by entering the email of a People's Market account (the person must create and confirm that account first). Order managers sign in on `/admin` using the **Order manager** option with their account email and password, and can only view orders and mark products sold out or back in stock; every action is enforced on the server (`app/admin/_lib/permissions.ts`). The dashboard updates live (about every 4 seconds) and the storefront reflects stock changes within about 5 seconds. Staff are stored in the existing `app_settings` table (key `admin_staff`), so no migration is needed. The access key remains a shared secret: keep it long and private.
 
+## Staff push notifications
+
+FreshCart can send browser push notifications to the owner and approved order managers when a Yoco payment is verified. Staff opt in from the admin dashboard using **Enable notifications**; the browser permission prompt is never shown automatically. Notifications are sent only for paid orders, not abandoned or unpaid checkouts.
+
+### Setup
+
+1. Create a Firebase project and register a Web App.
+2. In Firebase Project Settings → Cloud Messaging, generate a Web Push certificate (VAPID key) and enable the Cloud Messaging API and FCM Registration API (the latter is enabled by default for most new projects).
+3. Create a Firebase service account for the server-side Admin SDK. Keep its private key secret.
+4. Set the Firebase variables from `.env.example` in Vercel. The `NEXT_PUBLIC_FIREBASE_*` values are browser configuration; `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY` must remain server-only.
+5. Keep the Vercel Node.js runtime on Node 24 (also enforced by `package.json`).
+6. Before deploying this branch, apply `prisma/migrations/20261106133800_fcm_order_notifications/migration.sql` to the Supabase database using the SQL Editor. The migration creates two RLS-protected tables; no existing order, product, customer, or staff rows are changed.
+7. Deploy the branch, sign in to `/admin` as the owner and each order manager, then select **Enable notifications** on every browser/device that should receive alerts.
+
+The server stores Firebase Installation IDs (FIDs) and notification delivery events in the new tables. Repeated payment verification is idempotent: a paid order event is only sent once successfully. If Firebase is not configured or a device has not opted in, checkout and payment verification continue to work; notification delivery failures are recorded without failing the customer's order.
+
+Web push requires HTTPS and browser support. iPhone/iPad notifications require the site to be installed as a web app on supported iOS/iPadOS versions before permission can be granted.
+
 ## Known MVP limits
 
 - Storefront display data is currently a curated static list; the checkout validates product slugs and prices against the database.
