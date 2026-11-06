@@ -54,7 +54,7 @@ FreshCart can send browser push notifications to the owner and approved order ma
 2. In Firebase Project Settings → Cloud Messaging, generate a Web Push certificate (VAPID key) and enable the Cloud Messaging API and FCM Registration API (the latter is enabled by default for most new projects).
 3. Create a Firebase service account for the server-side Admin SDK. Keep its private key secret.
 4. Set the Firebase variables from `.env.example` in Vercel. The `NEXT_PUBLIC_FIREBASE_*` values are browser configuration; `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY` must remain server-only.
-5. Set the Vercel Node.js runtime to Node 22 or later (also enforced by `package.json`).
+5. Keep the Vercel Node.js runtime on Node 24 (also enforced by `package.json`).
 6. Before deploying this branch, apply `prisma/migrations/20261106133800_fcm_order_notifications/migration.sql` to the Supabase database using the SQL Editor. The migration creates two RLS-protected tables; no existing order, product, customer, or staff rows are changed.
 7. Deploy the branch, sign in to `/admin` as the owner and each order manager, then select **Enable notifications** on every browser/device that should receive alerts.
 
