@@ -1,0 +1,77 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { authenticate } from '@/app/admin/_lib/auth';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+const noStore = { 'Cache-Control': 'no-store' };
+
+async function getActor(request: NextRequest) {
+  const authorization = request.headers.get('authorization') || '';
+  const credential = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+  return credential ? authenticate(credential) : null;
+}
+
+export async function POST(request: NextRequest) {
+  const actor = await getActor(request);
+  if (!actor) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStore });
+
+  let body: { token?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400, headers: noStore });
+  }
+
+  const token = typeof body.token === 'string' ? body.token.trim() : '';
+  if (token.length < 20 || token.length > 4096) {
+    return NextResponse.json({ error: 'Invalid notification device token.' }, { status: 400, headers: noStore });
+  }
+
+  await prisma.pushSubscription.upsert({
+    where: { token },
+    create: {
+      token,
+      role: actor.role,
+      email: actor.email || null,
+      userAgent: (request.headers.get('user-agent') || '').slice(0, 512) || null,
+      lastSeenAt: new Date(),
+    },
+    update: {
+      role: actor.role,
+      email: actor.email || null,
+      userAgent: (request.headers.get('user-agent') || '').slice(0, 512) || null,
+      lastSeenAt: new Date(),
+    },
+  });
+
+  return NextResponse.json({ success: true }, { headers: noStore });
+}
+
+export async function DELETE(request: NextRequest) {
+  const actor = await getActor(request);
+  if (!actor) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStore });
+
+  let body: { token?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400, headers: noStore });
+  }
+
+  const token = typeof body.token === 'string' ? body.token.trim() : '';
+  if (token.length < 20 || token.length > 4096) {
+    return NextResponse.json({ error: 'Invalid notification device token.' }, { status: 400, headers: noStore });
+  }
+
+  await prisma.pushSubscription.deleteMany({
+    where: {
+      token,
+      role: actor.role,
+      email: actor.email || null,
+    },
+  });
+
+  return NextResponse.json({ success: true }, { headers: noStore });
+}
