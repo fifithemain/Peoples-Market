@@ -57,7 +57,8 @@ model Order {
   deliveryNotes   String?     @map("notes")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @default(now()) @updatedAt @map("updated_at")
-  items           OrderItem[]
+  items              OrderItem[]
+  notificationEvents NotificationEvent[]
 
   @@map("orders")
 }
@@ -83,4 +84,35 @@ model AppSetting {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("app_settings")
+}
+
+model PushSubscription {
+  id         String   @id @default(uuid()) @db.Uuid
+  token      String   @unique
+  role       String
+  email      String?
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  lastSeenAt DateTime @default(now()) @map("last_seen_at")
+
+  @@index([role, email])
+  @@map("push_subscriptions")
+}
+
+model NotificationEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  orderId   String   @db.Uuid @map("order_id")
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  eventType String   @map("event_type")
+  status    String   @default("pending")
+  attempts  Int      @default(0)
+  lastError String?  @map("last_error")
+  sentAt    DateTime? @map("sent_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([orderId, eventType])
+  @@index([status, updatedAt])
+  @@map("notification_events")
 }
