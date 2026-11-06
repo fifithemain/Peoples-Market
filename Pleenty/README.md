@@ -51,7 +51,7 @@ FreshCart can send browser push notifications to the owner and approved order ma
 ### Setup
 
 1. Create a Firebase project and register a Web App.
-2. In Firebase Project Settings → Cloud Messaging, generate a Web Push certificate (VAPID key) and enable the Cloud Messaging API.
+2. In Firebase Project Settings → Cloud Messaging, generate a Web Push certificate (VAPID key) and enable the Cloud Messaging API and FCM Registration API (the latter is enabled by default for most new projects).
 3. Create a Firebase service account for the server-side Admin SDK. Keep its private key secret.
 4. Set the Firebase variables from `.env.example` in Vercel. The `NEXT_PUBLIC_FIREBASE_*` values are browser configuration; `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY` must remain server-only.
 5. Set the Vercel Node.js runtime to Node 22 or later (also enforced by `package.json`).
