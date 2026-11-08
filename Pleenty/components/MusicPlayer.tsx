@@ -3,6 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
+function isYouTubePage(value: string) {
+  try {
+    const host = new URL(value).hostname.toLowerCase().replace(/^www\\./, '');
+    return host === 'youtube.com' || host === 'music.youtube.com' || host === 'youtu.be' || host.endsWith('.youtube.com');
+  } catch { return false; }
+}
+
 export default function MusicPlayer() {
   const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -65,6 +72,7 @@ export default function MusicPlayer() {
   if ((!enabled || !tracks.length) && !loadError) return null;
   const next = () => { setPlaybackError(''); setIndex(current => (current + 1) % tracks.length); };
   if (loadError) return <aside className="store-music-player" aria-label="Store music status"><div className="music-player-heading"><span className="music-player-label">♫ FRESHCART RADIO</span></div><p className="music-player-error" role="status">{loadError}</p></aside>;
+  if (isYouTubePage(tracks[index])) return <aside className="store-music-player" aria-label="Store music status"><div className="music-player-heading"><span className="music-player-label">♫ FRESHCART RADIO</span><span className="music-track-label">Track {index + 1} of {tracks.length}</span></div><p className="music-player-error" role="status">This is a YouTube Music page, not a direct audio file, so it can’t play in the store player. In Admin → Storefront music, upload an audio file or add a direct audio-file URL.</p>{tracks.length > 1 && <button type="button" onClick={next} aria-label="Play next song">Next song →</button>}</aside>;
   return <aside className="store-music-player" aria-label="FreshCart store music">
     <div className="music-player-heading"><span className="music-player-label">♫ FRESHCART RADIO</span><span className="music-track-label">Track {index + 1} of {tracks.length}</span></div>
     <audio ref={audioRef} key={tracks[index]} controls autoPlay preload="auto" src={tracks[index]} onPlay={() => { setIsPlaying(true); setNeedsTap(false); setPlaybackError(''); }} onPause={() => setIsPlaying(false)} onError={() => { setIsPlaying(false); setNeedsTap(true); setPlaybackError('This track could not be loaded. Check that its URL points to a public audio file.'); }} onEnded={next} aria-label="FreshCart background music" />
