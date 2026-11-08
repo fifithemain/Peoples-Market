@@ -157,3 +157,18 @@
 .admin-notifications small{flex-basis:100%;font-size:11px;opacity:.8;max-width:260px}
 .admin-notifications-enabled{font-size:12px;font-weight:700;color:#d7f5dc}
 @media(max-width:700px){.admin-notifications{justify-content:flex-start}.admin-notifications small{max-width:100%}}
+
+
+/* Mobile storefront header: keep account access visible and make every nav item fit without horizontal scrolling. */
+@media(max-width:620px){
+  .header{height:auto;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand actions" "search search";row-gap:10px;padding:12px 0}
+  .header>.brand{grid-area:brand;min-width:0}
+  .header>.search{grid-area:search;width:100%;max-width:none;min-height:44px}
+  .header>.header-actions{grid-area:actions;display:flex;gap:7px;min-width:0}
+  .header-actions .account-link,.header-actions .basket-btn{min-height:42px;padding:9px 10px}
+  .header-actions .basket-btn{gap:6px}
+  .nav{height:auto;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:8px 15px;overflow:visible;white-space:normal;align-items:stretch}
+  .nav button{height:auto;min-height:42px;padding:8px 6px;white-space:normal;line-height:1.2;font-size:11px;border:1px solid #e9ece6;border-radius:10px}
+  .nav button:nth-of-type(5){grid-column:1/-1}
+  .nav-note{display:none}
+}
