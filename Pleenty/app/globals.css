@@ -172,3 +172,9 @@
   .nav button:nth-of-type(5){grid-column:1/-1}
   .nav-note{display:none}
 }
+
+
+/* Keep storefront music accessible above the fixed mobile basket and expose media errors. */
+.store-music-player{z-index:40}
+.music-player-error{flex-basis:100%;margin:0;color:#a23c2b;font-size:11px;line-height:1.45}
+@media(max-width:680px){.store-music-player{bottom:calc(76px + env(safe-area-inset-bottom));right:12px;left:auto;width:min(340px,calc(100vw - 24px))}}

@@ -106,6 +106,10 @@ export async function saveMusicSettings(credential: string, tracks: string[], en
     let url: URL;
     try { url = new URL(track); } catch { throw new Error('Each song must be a valid HTTPS audio URL.'); }
     if (url.protocol !== 'https:') throw new Error('Each song must use HTTPS.');
+    const host = url.hostname.toLowerCase().replace(/^www\./, '');
+    if (host === 'youtube.com' || host === 'music.youtube.com' || host === 'youtu.be' || host.endsWith('.youtube.com')) {
+      throw new Error('YouTube and YouTube Music page links cannot be played by the store music player. Upload an audio file or enter a direct audio-file URL.');
+    }
   }
   const value = { enabled: Boolean(enabled) && cleanTracks.length > 0, tracks: cleanTracks };
   await prisma.appSetting.upsert({
