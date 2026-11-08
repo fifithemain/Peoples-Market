@@ -45,7 +45,7 @@ export default function MusicPanel({ initial, busy, act }: Props) {
 
   return <section className="admin-dashboard-content"><div className="panel">
     <h2>Storefront music</h2>
-    <p className="panel-intro">Add direct HTTPS links to audio files (such as MP3 or OGG), one URL per line. Most streaming-page URLs are not direct audio files. Browsers may block sound autoplay until the visitor presses Play.</p>
+    <p className="panel-intro">Add direct HTTPS links to audio files (such as MP3 or OGG), one URL per line. YouTube Music, YouTube, and streaming-page links are not audio files and cannot play here. Upload an audio file or enter a direct HTTPS link to an audio file. Browsers may also require visitors to tap Play before sound starts.</p>
     <form className="admin-form" onSubmit={save}>
       <label>Upload song files<input type="file" accept="audio/*,.mp3,.ogg,.wav,.m4a,.aac,.webm" multiple disabled={uploading || busy} onChange={e => { void upload(e.currentTarget.files); e.currentTarget.value = ''; }} /><small>Choose MP3, OGG, WAV, M4A, AAC or WEBM files. Maximum 15 MB per song. Uploaded songs are stored in FreshCart’s music library.</small></label>
       <label>Or add direct song URLs<textarea rows={5} placeholder={'https://your-domain.com/music/song-one.mp3' + NEWLINE + 'https://your-domain.com/music/song-two.mp3'} value={tracks} onChange={e => setTracks(e.target.value)} /><small>Up to 30 songs total. Use audio files you own or are licensed to play.</small></label>
