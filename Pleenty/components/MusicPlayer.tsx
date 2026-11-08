@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 
 function isYouTubePage(value: string) {
   try {
-    const host = new URL(value).hostname.toLowerCase().replace(/^www\\./, '');
+    const host = new URL(value).hostname.toLowerCase().replace(/^www\./, '');
     return host === 'youtube.com' || host === 'music.youtube.com' || host === 'youtu.be' || host.endsWith('.youtube.com');
   } catch { return false; }
 }
